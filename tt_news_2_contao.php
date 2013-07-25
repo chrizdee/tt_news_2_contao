@@ -76,6 +76,12 @@ if (	$_POST['source_host'] &&
 		}
 		$bodytext = str_replace('</link>', '</a>', $bodytext);
 
+		if ($_POST['generate_teaser'])
+		{
+			$bodytext_clean = strip_tags($bodytext);
+			$teaser = substr($bodytext_clean, 0, strpos($bodytext_clean, '.') + 1);
+		}
+
 		if ($row['image'])
 		{
 			$images = explode(',', $row['image']);
@@ -94,7 +100,8 @@ if (	$_POST['source_host'] &&
 							'.$starttime.$endtime.$image.'
 							published='.$published.',
 							headline="'.mysql_real_escape_string($row['title']).'",
-							teaser="'.mysql_real_escape_string($row['short']).'",
+							subheadline="'.mysql_real_escape_string($row['short']).'",
+							teaser="'.mysql_real_escape_string($teaser).'",
 							text="'.mysql_real_escape_string($bodytext).'"';
 
 		if ($_POST['testing_mode'] != '1')
@@ -190,6 +197,9 @@ else
 					<div class="controls">
 					  	<label class="checkbox">
 				      	<input name="testing_mode" type="checkbox" value="1" checked="checked"> Testing mode
+				    	</label>
+				    	<label class="checkbox">
+				      	<input name="generate_teaser" type="checkbox" value="1" checked="checked"> Generate teaser text
 				    	</label>
 				    	<button type="submit" class="btn btn-large btn-primary">Import</button>
 				    </div>
