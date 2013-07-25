@@ -52,6 +52,30 @@ if (	$_POST['source_host'] &&
 		if ($row['starttime'] > 0) $starttime = ' start='.$row['starttime'].', ';
 		if ($row['endtime'] > 0) $endtime = ' stop='.$row['endtime'].', ';
 
+		$bodytext = $row['bodytext'];
+		$pattern = "/(<link ([^>]*)>)(.*?)(<\/link>)/si";
+		preg_match_all($pattern,$bodytext,$regs);
+		for ($i = 0; $i < count($regs[0]); $i++)
+		{
+		    if (is_numeric($regs[2][$i]))
+		    {
+		        // Internal link
+				$bodytext = str_replace($regs[1][$i],'<a href="http://your_host_name/index.php?id='.$regs[2][$i].'">',$bodytext);
+		    }
+		    else if (ereg('@',$regs[2][$i]))
+		    {
+		        // Email address
+				$bodytext = str_replace($regs[1][$i],'<a href="mailto:'.$regs[2][$i].'">',$bodytext);
+		    }
+		    else
+		    {
+		        // External links
+		        $link = explode(' ', $regs[2][$i]);
+				$bodytext = str_replace($regs[1][$i],'<a href="'.$link[0].'" target="'.$link[1].'">',$bodytext);
+		    }
+		}
+		$bodytext = str_replace('</link>', '</a>', $bodytext);
+
 		if ($row['image'])
 		{
 			$images = explode(',', $row['image']);
@@ -71,7 +95,7 @@ if (	$_POST['source_host'] &&
 							published='.$published.',
 							headline="'.mysql_real_escape_string($row['title']).'",
 							teaser="'.mysql_real_escape_string($row['short']).'",
-							text="'.mysql_real_escape_string($row['bodytext']).'"';
+							text="'.mysql_real_escape_string($bodytext).'"';
 
 		if ($_POST['testing_mode'] != '1')
 		{
