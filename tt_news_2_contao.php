@@ -1,4 +1,10 @@
 <?php
+
+function clean ($text)
+{
+	return str_replace('<img src="fileadmin/styles/01_layouts_basics/img/icons/external_link_new_window.gif" alt="" />', '', $text);
+}
+
 if (	$_POST['source_host'] && 
 		$_POST['source_user'] && 
 		$_POST['source_password'] &&
@@ -89,6 +95,7 @@ if (	$_POST['source_host'] &&
 			// at default, contao only supports one image, so we will take the first one from typo3
 			$image = ' addImage=1, singleSRC="'.$_POST['target_image_path'].$images[0].'", alt="'.mysql_real_escape_string($image_alttexts[0]).'", ';
 		}
+		else unset($image);
 
 		$sql_target = '	INSERT INTO 
 					   		tl_news 
@@ -102,7 +109,7 @@ if (	$_POST['source_host'] &&
 							headline="'.mysql_real_escape_string($row['title']).'",
 							subheadline="'.mysql_real_escape_string($row['short']).'",
 							teaser="'.mysql_real_escape_string($teaser).'",
-							text="'.mysql_real_escape_string($bodytext).'"';
+							text="'.mysql_real_escape_string(clean($bodytext)).'"';
 
 		if ($_POST['testing_mode'] != '1')
 		{
